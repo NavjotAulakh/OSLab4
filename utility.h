@@ -13,20 +13,36 @@
 
 // Resources structure containing integers for each resource constraint and an
 // array of 1024 for the memory
-// typedef struct {
-//  ...
-//  ...
-// } resources;
+typedef struct {
+    int memory[MEMORY];
+	int printers;
+    int scanners;
+    int modem;
+    int drives;
+} resources;
 
 
 // Processes structure containing all of the process details parsed from the 
 // input file, should also include the memory address (an index) which indicates
 // where in the resources memory array its memory was allocated
-// typedef struct {
-//  ...
-//  ...
-// } process;
+typedef struct{
+    int pid;
+    int arrivalTime;
+	int priority;
+	int address;
+	int duration;
+	int memory;
+	int printers;
+    int scanners;
+    int modem;
+    int drives;
+} proc;
 
+typedef struct node {
+   proc data; 
+   struct node *next;
+   struct node *prev;
+}node_q;
 
 // Include your relevant functions declarations here they must start with the 
 // extern keyword such as in the following examples:
@@ -44,6 +60,13 @@
 // Function to parse the file and initialize each process structure and add
 // it to your job dispatch list queue (linked list)
 // extern void load_dispatch(char *dispatch_file, node_t *queue);
+
+extern proc * pop(node_q *queue);
+extern void push(proc process, node_q *queue);
+extern void displayProcess(proc *pro);
+extern void printList(node_q *list);
+extern bool allocateMemory(int *memory, int size);
+extern void deallocateMemory(int *memory);
 
 
 #endif /* UTILITY_H_ */
