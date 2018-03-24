@@ -13,6 +13,7 @@
 // Include any relevant functions declarations here they must start with the 
 // extern keyword such as in the following example:
 // extern void print_process(proc process);
-
+extern void queue_up(node_t *queue);
+extern int execute_process(proc proc);
 
 #endif /* HOSTD_H_ */
