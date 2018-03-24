@@ -10,22 +10,10 @@
 
 #include "utility.h"
 
-// Your linked list structure for your queue
-// typedef ... 
-//  ...
-//  proc process;
-//  ...
-//} node_t; 
-
 // Include your relevant FIFO queue functions declarations here they must start 
 // with the extern keyword such as in the following examples:
-
-// Add a new process to the queue, returns the address of the next node added
-// to the linked list
-
-// extern node_t *push(node_t *tail, proc process);
-
-// extern node_t *pop(node_t *tail);
-
+extern proc * pop(node_q *queue);
+extern void push(proc process, node_q *queue);
+extern void printList(node_q *list);
 
 #endif /* QUEUE_H_ */

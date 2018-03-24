@@ -14,17 +14,18 @@
 // Resources structure containing integers for each resource constraint and an
 // array of 1024 for the memory
 typedef struct {
-    int memory[MEMORY];
+    int available_memory[MEMORY];
 	int printers;
     int scanners;
     int modem;
     int drives;
 } resources;
 
-
 // Processes structure containing all of the process details parsed from the 
 // input file, should also include the memory address (an index) which indicates
 // where in the resources memory array its memory was allocated
+
+
 typedef struct{
     int pid;
     int arrivalTime;
@@ -38,8 +39,9 @@ typedef struct{
     int drives;
 } proc;
 
+// Your linked list structure for your queue
 typedef struct node {
-   proc data; 
+   proc process; 
    struct node *next;
    struct node *prev;
 }node_q;
@@ -61,12 +63,11 @@ typedef struct node {
 // it to your job dispatch list queue (linked list)
 // extern void load_dispatch(char *dispatch_file, node_t *queue);
 
-extern proc * pop(node_q *queue);
-extern void push(proc process, node_q *queue);
 extern void displayProcess(proc *pro);
-extern void printList(node_q *list);
-extern bool allocateMemory(int *memory, int size);
-extern void deallocateMemory(int *memory);
-
+extern int allocateMemory(int *memory, proc tempProcess, int size);
+extern void deallocateMemory(int *memory, proc tempProcess);
+extern int allocateResources(proc tempProcess, resources rec);
+extern void deallocateResources(proc tempProcess, resources rec);
+extern int handleProcess(proc tempProcess, char* arg[]);
 
 #endif /* UTILITY_H_ */

@@ -7,6 +7,7 @@
  */
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <unistd.h>
@@ -21,10 +22,8 @@
 #define MEMORY 1024
 
 // Put global environment variables here
-int dispacherTime;
-dispatcherTime = 0;
-int dispacherNodes;
-dispacherNodes = 0;
+int dispatcherTime= 0;
+int dispatcherNodes = 0;
 
 // Define functions declared in hostd.h here
 
@@ -32,6 +31,11 @@ int main(int argc, char *argv[])
 {
     // ==================== YOUR CODE HERE ==================== //
 	proc tempProcess;
+	resources res_avail;
+	res_avail.printers = 2;
+	res_avail.scanners = 1;
+	res_avail.modem = 1;
+	res_avail.drives = 2;
     node_q * priority1 = NULL;
 	node_q * priority2 = NULL;
     node_q * priority3 = NULL;
@@ -46,12 +50,21 @@ int main(int argc, char *argv[])
     priority2 = malloc(sizeof(node_q));
     priority3 = malloc(sizeof(node_q));
 	
+	// Initalise memory to 0
+	for(int i = 0; i < MEMORY; i++){
+		res_avail.available_memory[i] = 0;
+	}
+
     // Load the dispatchlist
-    FILE *fp = fopen("dispachlist", "r");
+    FILE *fp = fopen("dispatchlist", "r");
 	if(fp == NULL)
     {
 		fprintf(stderr, "FILE OPEN ERROR \n");
 		exit(1);
+	}
+	else
+	{
+		
 	}
 	
     char *line = NULL;
@@ -65,7 +78,7 @@ int main(int argc, char *argv[])
 
 		char *token = NULL;
 		token = strtok(line,",\n");
-		strcpy(tempProcess.arrivalTime,token);
+		tempProcess.arrivalTime = atoi(token);
 		
 		token = strtok(NULL,",\n");
 		tempProcess.priority = atoi(token);
@@ -90,52 +103,153 @@ int main(int argc, char *argv[])
 
 		
 		push(tempProcess, jobDispatcher);
-		dispacherNodes += 1;
+		dispatcherNodes += 1;
 	}
 
-   
-
-	// Iterate through each item in the job dispatch list, add each process
-    // to the appropriate queues
-	if (jobDispatcher->next != NULL)
+	fclose(fp);
+	
+	while(1)
 	{
-		int count;
-		count = dispacherNodes;
+		dispatcherTime += 1;
+		printf("Dispatcher Time: %d\n", dispatcherTime);
 		
-		while (count > 0){
+		// Iterate through each item in the job dispatch list, add each process
+		// to the appropriate queues
+		if (jobDispatcher->next != NULL)
+		{
 			
-			tempProcess = *pop(jobDispatcher);
-			if (tempProcess.arrivalTime <= dispacherTime)
+			int count;
+			count = dispatcherNodes;
+			
+			while (count >= 0)
 			{
-				if (tempProcess.priority == 0)
+				
+				tempProcess = *pop(jobDispatcher);
+				if (tempProcess.arrivalTime <= dispatcherTime)
 				{
-					push(tempProcess, realTime);
+					
+					if (tempProcess.priority == 0)
+					{
+						push(tempProcess, realTime);
+						dispatcherNodes--;
+					}
+					else 
+					{
+						push(tempProcess, userJobQueue);
+						dispatcherNodes--;
+					}
 				}
-				else 
+				else
+				{
+					push(tempProcess, jobDispatcher);
+				}
+				count-= 1;
+				printf("count:%d\n", count);
+			}
+			printf("do we ever get here?\n");
+			
+		}
+		// Allocate the resources for each process before it's executed
+		if (realTime->next == NULL)
+		{
+			printf("realtime == null\n");
+			if (userJobQueue->next != NULL)
+			{
+				printf("userJobQueue != null\n");
+				tempProcess = *pop(userJobQueue);
+				if (allocateMemory(res_avail.available_memory, tempProcess, MEMORY)){
+					printf("memory allocated == true\n");
+					if(allocateResources(tempProcess, res_avail)){
+						if(tempProcess.priority == 1)
+						{
+							push(tempProcess, priority1);
+						}
+						if(tempProcess.priority == 2)
+						{
+							push(tempProcess, priority2);
+						}
+						if(tempProcess.priority == 3)
+						{
+							push(tempProcess, priority3);
+						}
+					}
+					else
+					{
+						push(tempProcess, userJobQueue);
+					}
+				}
+				else
 				{
 					push(tempProcess, userJobQueue);
 				}
 			}
+		}
 
-			else
+		// Execute the process binary using fork and exec
+		// Perform the appropriate signal handling / resource allocation and de-alloaction
+		else
+		{
+			tempProcess = *pop(realTime);
+			int pid = fork();
+			int status;
+			if (pid == 0) //child
 			{
-				push(tempProcess, jobDispatcher);
+				tempProcess.pid = getpid();
+				tempProcess.duration--;
+				displayProcess(&tempProcess);
+				execv("./process", argv);
+				exit(0);
+			}
+			else // parent
+			{
+				sleep(tempProcess.duration);
+				kill(pid, SIGTSTP);
+				kill(pid, SIGINT);
+				waitpid(pid, &status, 0);
 			}
 		}
-		
-	}
 
-	
-	while(1)
-	{
-		// Allocate the resources for each process before it's executed
-		
-		// Execute the process binary using fork and exec
+		if (priority1->next == NULL)
+		{
+			if (priority2->next == NULL)
+			{
+				if (priority3->next == NULL)
+				{
+					if (jobDispatcher->next == NULL)
+						exit(0);
+				}
+				else 
+				{
+					tempProcess = *pop(priority3);
+					if (handleProcess(tempProcess, argv))
+					{
+						push(tempProcess, priority3);
+					}
+				}
+			}
+			else 
+			{
+				tempProcess = *pop(priority2);
+				if (handleProcess(tempProcess, argv))
+				{
+					tempProcess.priority = 3;
+					push(tempProcess, priority2);
+				}
+			}
 
-		// Perform the appropriate signal handling / resource allocation and de-alloaction
+		}
+		else 
+		{
+			tempProcess = *pop(priority1);
+			if (handleProcess(tempProcess, argv))
+			{
+				tempProcess.priority = 2;
+				push(tempProcess, priority2);
+			}
+		}
 
 		// Repeat until all processes have been executed, all queues are empty
-				
+		
 	}
 
     return EXIT_SUCCESS;
