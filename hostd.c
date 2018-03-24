@@ -111,7 +111,6 @@ int main(int argc, char *argv[])
 	while(1)
 	{
 		dispatcherTime += 1;
-		printf("Time: %d\n", dispatcherTime);
 		
 		// Iterate through each item in the job dispatch list, add each process
 		// to the appropriate queues
@@ -124,10 +123,11 @@ int main(int argc, char *argv[])
 			while (count > 0)
 			{
 				
-				tempProcess = *pop(jobDispatcher);
-				if (&tempProcess == NULL){
+				proc * pProcess = pop(jobDispatcher);
+				if (pProcess == NULL){
 					break;
 				}
+				tempProcess = *pProcess;
 				if (tempProcess.arrivalTime <= dispatcherTime)
 				{
 					
@@ -167,17 +167,17 @@ int main(int argc, char *argv[])
 						//printf("resource allocated == true\n");
 						if(tempProcess.priority == 1)
 						{
-							//printf("pushed into p1\n");
+							printf("pushed into p1\n");
 							push(tempProcess, priority1);
 						}
 						if(tempProcess.priority == 2)
 						{
-							//printf("pushed into p2\n");
+							printf("pushed into p2\n");
 							push(tempProcess, priority2);
 						}
 						if(tempProcess.priority == 3)
 						{
-							//printf("pushed into p3.\n");
+							printf("pushed into p3.\n");
 							push(tempProcess, priority3);
 						}
 					}
@@ -231,20 +231,24 @@ int main(int argc, char *argv[])
 				}
 				else 
 				{
+					
 					tempProcess = *pop(priority3);
-					if (handleProcess(tempProcess, argv))
-					{
+					tempProcess = handleProcess(tempProcess, argv);
+					if (tempProcess.duration > 0){
+						tempProcess.priority = 3;
 						push(tempProcess, priority3);
 					}
+					
+					
 				}
 			}
 			else 
 			{
 				tempProcess = *pop(priority2);
-				if (handleProcess(tempProcess, argv))
-				{
+				tempProcess = handleProcess(tempProcess, argv);
+				if (tempProcess.duration > 0){
 					tempProcess.priority = 3;
-					push(tempProcess, priority2);
+					push(tempProcess, priority3);
 				}
 			}
 
@@ -252,8 +256,8 @@ int main(int argc, char *argv[])
 		else 
 		{
 			tempProcess = *pop(priority1);
-			if (handleProcess(tempProcess, argv))
-			{
+			tempProcess = handleProcess(tempProcess, argv);
+			if (tempProcess.duration > 0){
 				tempProcess.priority = 2;
 				push(tempProcess, priority2);
 			}

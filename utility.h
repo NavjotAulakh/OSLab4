@@ -67,6 +67,6 @@ extern int allocateMemory(int *memory, proc tempProcess, int size);
 extern void deallocateMemory(int *memory, proc tempProcess);
 extern int allocateResources(proc tempProcess, resources rec);
 extern void deallocateResources(proc tempProcess, resources rec);
-extern int handleProcess(proc tempProcess, char* arg[]);
+extern proc handleProcess(proc tempProcess, char* arg[]);
 
 #endif /* UTILITY_H_ */

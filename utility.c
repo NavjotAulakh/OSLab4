@@ -16,8 +16,8 @@ void displayProcess(proc * process)
 {
  if (process != NULL)
   {
-    printf("\n | Priority: %10d | pid: %10d | Runtime: %10d | \n", 
-    process -> priority, process -> pid, process -> duration);
+    printf("\n | Arrivial Time: %10d| Priority: %10d | pid: %10d | Runtime: %10d | RAM: %10d \n", 
+    process->arrivalTime, process -> priority, process -> pid, process -> duration, process->memory);
   }
 }
 
@@ -77,59 +77,52 @@ void deallocateResources(proc tempProcess, resources rec)
     rec.drives += tempProcess.drives;
 }
 
-int handleProcess(proc tempProcess, char* arg[])
+proc handleProcess(proc tempProcess, char* arg[])
 {
-    int status;
-    int pid = fork();
-    if (tempProcess.pid != 0){
-        if (pid == 0) //child
+    if (tempProcess.pid != 0)
+    {
+	
+        tempProcess.duration = tempProcess.duration - 1;
+        kill(tempProcess.pid, SIGCONT);
+        sleep(1);
+        if (tempProcess.duration > 0 )
         {
-            tempProcess.duration--;
-            displayProcess(&tempProcess);
-            execv("./process", arg);
-            exit(0);
+            kill(tempProcess.pid, SIGTSTP);
         }
-        else // parent
+        else 
         {
-            kill(pid, SIGCONT);
-            sleep(1);
-            if (tempProcess.duration > 0 )
-            {
-                kill(pid, SIGTSTP);
-                return 1;
-            }
-            else 
-            {
-                kill(pid, SIGINT);
-                return 0;
-            }  
-        }
+            kill(tempProcess.pid, SIGINT);
+        }  
+        
     }
-
     else 
     {
+        int pid;
+		pid = fork();
         if (pid == 0) //child
         {
             tempProcess.pid = getpid();
-            tempProcess.duration--;
-            displayProcess(&tempProcess);
+			displayProcess(&tempProcess);
             execv("./process", arg);
             exit(0);
         }
         else // parent
         {
+			tempProcess.pid = pid;
+			tempProcess.duration = tempProcess.duration - 1;
             sleep(1);
             if (tempProcess.duration > 0 )
             {
                 kill(pid, SIGTSTP);
-                return 1;
+              
             }
             else 
             {
                 kill(pid, SIGINT);
-                return 0;
+                
             }  
         }
     }
+	return tempProcess;
     
 }
