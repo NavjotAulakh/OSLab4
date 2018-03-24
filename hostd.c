@@ -155,41 +155,41 @@ int main(int argc, char *argv[])
 		// Allocate the resources for each process before it's executed
 		if (realTime->next == NULL)
 		{
-			//printf("realtime == null\n");
+			
 			if (userJobQueue->next != NULL)
 			{
-				//printf("userJobQueue != null\n");
+				
 				tempProcess = *pop(userJobQueue);
 				if (allocateMemory(res_avail.available_memory, tempProcess, MEMORY)){
-					//printf("memory allocated == true\n");
+		
 					if(allocateResources(tempProcess, res_avail))
 					{
-						//printf("resource allocated == true\n");
+		
 						if(tempProcess.priority == 1)
 						{
-							printf("pushed into p1\n");
+		
 							push(tempProcess, priority1);
 						}
 						if(tempProcess.priority == 2)
 						{
-							printf("pushed into p2\n");
+							
 							push(tempProcess, priority2);
 						}
 						if(tempProcess.priority == 3)
 						{
-							printf("pushed into p3.\n");
+					
 							push(tempProcess, priority3);
 						}
 					}
 					else
 					{
-						//printf("not enough resources.\n");
+						
 						push(tempProcess, userJobQueue);
 					}
 				}
 				else
 				{
-					//printf("not enough resources.\n");
+		
 					push(tempProcess, userJobQueue);
 				}
 			}
@@ -199,7 +199,7 @@ int main(int argc, char *argv[])
 		// Perform the appropriate signal handling / resource allocation and de-alloaction
 		else
 		{
-			//printf("handling real time process\n");
+	
 			tempProcess = *pop(realTime);
 			int pid = fork();
 			int status;
