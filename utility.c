@@ -11,6 +11,7 @@
 #include "utility.h"
 #include "queue.h"
 int avail_mem[MEMORY] = {0};
+
 // Define your utility functions here, you will likely need to add more...
 int alloc_res(proc p)
 {
@@ -28,6 +29,7 @@ int alloc_res(proc p)
     else 
  		return 0;
 }
+
 void free_res(proc p)
 {
     avail_res.printers = avail_res.printers + p.res.printers;

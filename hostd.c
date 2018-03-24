@@ -131,8 +131,8 @@ int execute_process(proc proc)
 			free_mem(proc); //deallocate the used memory
 			free_res(proc); //free the resources
 
-		} 
-        
+		}
+
         else 
         { //if still runtime left
 
@@ -183,7 +183,7 @@ int main(int argc, char *argv[])
     avail_res.printers = 2;
     avail_res.scanners = 1;
     avail_res.cds = 2;
-    avail_res.modems = 2;
+    avail_res.modems = 1;
     //set up resources
 
     // Load the dispatchlist
@@ -248,141 +248,10 @@ int main(int argc, char *argv[])
         {
             break;
         }
-    } 
+    }
 
-        sleep(2); //to finish prints and all
+        sleep(4); //to finish prints and all
         printf("COMPLETE.\n");
-  //  */
-
-    // Add each process structure instance to the job dispatch list queue
-
-    // Iterate through each item in the job dispatch list, add each process
-    // to the appropriate queues
-
-    // Allocate the resources for each process before it's executed
-
-    // Execute the process binary using fork and exec
-
-    // Perform the appropriate signal handling / resource allocation and de-alloaction
-
-    // Repeat until all processes have been executed, all queues are empty
-
+ 
     return EXIT_SUCCESS;
 }
-// Define functions declared in hostd.h here
-/*
-int main(int argc, char *argv[])
-{
-    // ==================== YOUR CODE HERE ==================== //
-	proc tempProcess;
-    node_t * priority1 = NULL;
-	node_t * priority2 = NULL;
-    node_t * priority3 = NULL;
-    node_t * realTime = NULL;
-	node_t * jobDispatcher = NULL;
-	node_t * userJobQueue = NULL;
-
-	jobDispatcher = malloc(sizeof(node_q));
-    realTime = malloc(sizeof(node_q));
-	userJobQueue = malloc(sizeof(node_q));
-	priority1 = malloc(sizeof(node_q));
-    priority2 = malloc(sizeof(node_q));
-    priority3 = malloc(sizeof(node_q));
-	
-    // Load the dispatchlist
-    FILE *fp = fopen("dispachlist", "r");
-	if(fp == NULL)
-    {
-		fprintf(stderr, "FILE OPEN ERROR \n");
-		exit(1);
-	}
-	
-    char *line = NULL;
-    size_t len = 0;
-    ssize_t read;
-    
-    // Add each process structure instance to the job dispatch list queue
-    while ((read = getline(&line, &len, fp)) != -1) 
-	{
-		tempProcess.pid = 0;
-
-		char *token = NULL;
-		token = strtok(line,",\n");
-		strcpy(tempProcess.arrivalTime,token);
-		
-		token = strtok(NULL,",\n");
-		tempProcess.priority = atoi(token);
-
-		token = strtok(NULL,",\n");
-		tempProcess.duration = atoi(token);
-
-		token = strtok(NULL,",\n");
-		tempProcess.memory = atoi(token);
-
-		token = strtok(NULL,",\n");
-		tempProcess.printers = atoi(token);
-		
-		token = strtok(NULL,",\n");
-		tempProcess.scanners = atoi(token);
-
-		token = strtok(NULL,",\n");
-		tempProcess.modem = atoi(token);
-
-		token = strtok(NULL,",\n");
-		tempProcess.drives = atoi(token);
-
-		
-		push(tempProcess, jobDispatcher);
-		dispacherNodes += 1;
-	}
-
-   
-
-	// Iterate through each item in the job dispatch list, add each process
-    // to the appropriate queues
-	if (jobDispatcher->next != NULL)
-	{
-		int count;
-		count = dispacherNodes;
-		
-		while (count > 0){
-			
-			tempProcess = *pop(jobDispatcher);
-			if (tempProcess.arrivalTime <= dispacherTime)
-			{
-				if (tempProcess.priority == 0)
-				{
-					push(tempProcess, realTime);
-				}
-				else 
-				{
-					push(tempProcess, userJobQueue);
-				}
-			}
-
-			else
-			{
-				push(tempProcess, jobDispatcher);
-			}
-		}
-		
-	}
-
-	
-	while(1)
-	{
-		// Allocate the resources for each process before it's executed
-		
-		// Execute the process binary using fork and exec
-
-		// Perform the appropriate signal handling / resource allocation and de-alloaction
-
-		// Repeat until all processes have been executed, all queues are empty
-				
-	}
-	
-
-    return EXIT_SUCCESS;
-}
-
-*/
