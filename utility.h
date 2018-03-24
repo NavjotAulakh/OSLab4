@@ -43,7 +43,6 @@ typedef struct{
 typedef struct node {
    proc process; 
    struct node *next;
-   struct node *prev;
 }node_q;
 
 // Include your relevant functions declarations here they must start with the 

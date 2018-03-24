@@ -20,11 +20,11 @@ proc * pop(node_q * queue){
 	}
 	node_q * nextNode = NULL;
 	nextNode = queue -> next -> next;
-	node_q * currentNode = queue -> next;
+	node_q * currentNode = NULL;
+    currentNode = queue -> next;
  	tempProcess = currentNode -> process;
-
- 	free(currentNode);
 	queue -> next = nextNode;
+    free(currentNode);
 
 	return &tempProcess;
 }
@@ -38,4 +38,6 @@ void push (proc process, node_q  * queue){
 
 	current -> next =  (node_q *) malloc(sizeof(node_q));
 	current -> next -> process = process;
+    current->next->next = NULL;
+	
 }

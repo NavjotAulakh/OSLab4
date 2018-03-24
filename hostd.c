@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
 	while(1)
 	{
 		dispatcherTime += 1;
-		printf("Dispatcher Time: %d\n", dispatcherTime);
+		printf("Time: %d\n", dispatcherTime);
 		
 		// Iterate through each item in the job dispatch list, add each process
 		// to the appropriate queues
@@ -121,10 +121,13 @@ int main(int argc, char *argv[])
 			int count;
 			count = dispatcherNodes;
 			
-			while (count >= 0)
+			while (count > 0)
 			{
 				
 				tempProcess = *pop(jobDispatcher);
+				if (&tempProcess == NULL){
+					break;
+				}
 				if (tempProcess.arrivalTime <= dispatcherTime)
 				{
 					
@@ -144,42 +147,49 @@ int main(int argc, char *argv[])
 					push(tempProcess, jobDispatcher);
 				}
 				count-= 1;
-				printf("count:%d\n", count);
+				
 			}
-			printf("do we ever get here?\n");
+			
 			
 		}
 		// Allocate the resources for each process before it's executed
 		if (realTime->next == NULL)
 		{
-			printf("realtime == null\n");
+			//printf("realtime == null\n");
 			if (userJobQueue->next != NULL)
 			{
-				printf("userJobQueue != null\n");
+				//printf("userJobQueue != null\n");
 				tempProcess = *pop(userJobQueue);
 				if (allocateMemory(res_avail.available_memory, tempProcess, MEMORY)){
-					printf("memory allocated == true\n");
-					if(allocateResources(tempProcess, res_avail)){
+					//printf("memory allocated == true\n");
+					if(allocateResources(tempProcess, res_avail))
+					{
+						//printf("resource allocated == true\n");
 						if(tempProcess.priority == 1)
 						{
+							//printf("pushed into p1\n");
 							push(tempProcess, priority1);
 						}
 						if(tempProcess.priority == 2)
 						{
+							//printf("pushed into p2\n");
 							push(tempProcess, priority2);
 						}
 						if(tempProcess.priority == 3)
 						{
+							//printf("pushed into p3.\n");
 							push(tempProcess, priority3);
 						}
 					}
 					else
 					{
+						//printf("not enough resources.\n");
 						push(tempProcess, userJobQueue);
 					}
 				}
 				else
 				{
+					//printf("not enough resources.\n");
 					push(tempProcess, userJobQueue);
 				}
 			}
@@ -189,6 +199,7 @@ int main(int argc, char *argv[])
 		// Perform the appropriate signal handling / resource allocation and de-alloaction
 		else
 		{
+			//printf("handling real time process\n");
 			tempProcess = *pop(realTime);
 			int pid = fork();
 			int status;
